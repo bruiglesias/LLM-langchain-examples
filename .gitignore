@@ -1,0 +1,5 @@
+.env
+video/
+langchain-crash-course/
+lang-chain-env/
+4_rag/db/
