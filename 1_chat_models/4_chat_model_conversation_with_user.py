@@ -3,21 +3,21 @@ from langchain_ollama import ChatOllama
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
 
 
-# Load environment variables from .env
+# Carregar variáveis de ambiente do arquivo .env
 load_dotenv()
 
-# Create a ChatOllama model
+# Criar um modelo ChatOllama
 model = ChatOllama(model = "llama3")
 
 
-chat_history = [] # Use a list to store messages
+chat_history = []  # Usar uma lista para armazenar as mensagens
 
 
-# Set an initial system message (optional)
+# Definir uma mensagem inicial do sistema (opcional)
 system_message = SystemMessage(content="You are a helpful AI assistant.")
 chat_history.append(system_message)
 
-# Chat loop
+# Loop do chat
 while True:
     query = input("You: ")
     
@@ -26,7 +26,7 @@ while True:
 
     chat_history.append(HumanMessage(content=query))
 
-    # Get AI response using history
+    # Obter resposta da IA usando o histórico
     result = model.invoke(chat_history)
     response = result.content
     chat_history.append(AIMessage(content=response))

@@ -3,30 +3,29 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.schema.runnable import RunnableLambda, RunnableSequence
 from langchain_ollama import ChatOllama
 
-# Load environment variables from .env
+# Carregar variáveis de ambiente do arquivo .env
 load_dotenv()
 
-# Create a ChatOllama model
+# Criar um modelo ChatOllama
 model = ChatOllama(model = "llama3")
 
-# Define prompt templates (no need for separate Runnable chains)
+# Definir templates de prompt (não há necessidade de cadeias separadas de Runnable)
 messages = [
     ("system", "You are a comedian who tells jokes about {topic}."),
     ("human", "Tell me {joke_count} jokes."),
 ]
 prompt_template = ChatPromptTemplate.from_messages(messages)
 
-
-# Create individual runnables (steps in the chain)
+# Criar runnables individuais (etapas na cadeia)
 format_prompt = RunnableLambda(lambda x: prompt_template.format_prompt(**x))
 invoke_model = RunnableLambda(lambda x: model.invoke(x.to_messages()))
 parse_output = RunnableLambda(lambda x: x.content)
 
-# Create the RunnableSequence (equivalent to the LCEL chain)
+# Criar a RunnableSequence (equivalente à cadeia LCEL)
 chain = RunnableSequence(first=format_prompt, middle=[invoke_model], last=parse_output)
 
-# Run the chain
+# Executar a cadeia
 response = chain.invoke({"topic": "lawyers", "joke_count": 3})
 
-# Output
+# Saída
 print(response)

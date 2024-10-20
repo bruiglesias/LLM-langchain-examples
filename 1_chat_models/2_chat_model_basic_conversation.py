@@ -2,18 +2,18 @@ from dotenv import load_dotenv
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_ollama import ChatOllama
 
-# Load environment variables from .env
+# Carregar variáveis de ambiente do arquivo .env
 load_dotenv()
 
-# Create a ChatOllama model
+# Criar um modelo ChatOllama
 model = ChatOllama(model = "llama3")
 
 # SystemMessage:
-# Message for priming AI behavior, usually passed in as the first of a sequence
-# of input messages.
+# Mensagem usada para ajustar o comportamento da IA, geralmente passada como a primeira
+# de uma sequência de mensagens de entrada.
 
-# HumanMessagse:
-#  Message from a human to the AI model.
+# HumanMessage:
+# Mensagem enviada por um humano para o modelo de IA.
 
 messages = [
     SystemMessage(content="Solve the following math problems"),
@@ -25,7 +25,7 @@ print(f"Answer from AI: {result.content}")
 
 
 # AIMessage:
-# Message from an AI
+# Mensagem da IA
 messages = [
     SystemMessage(content="Solve the following math problems"),
     HumanMessage(content="what is 81 divided by 9?"),
@@ -33,7 +33,7 @@ messages = [
     HumanMessage(content="What is 10 times 5?"),
 ]
 
-# Invoke the model with messages
+# Invocar o modelo com as mensagens
 result = model.invoke(messages)
 print()
 print(f"Answer from AI: {result.content}")

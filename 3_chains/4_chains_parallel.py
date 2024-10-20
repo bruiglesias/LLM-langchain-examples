@@ -4,13 +4,13 @@ from langchain.schema.output_parser import StrOutputParser
 from langchain.schema.runnable import RunnableParallel, RunnableLambda
 from langchain_ollama import ChatOllama
 
-# Load environment variables from .env
+# Carregar variáveis de ambiente do arquivo .env
 load_dotenv()
 
-# Create a ChatOllama model
+# Criar um modelo ChatOllama
 model = ChatOllama(model = "llama3")
 
-# Define prompt templates (no need for separate Runnable chains)
+# Definir templates de prompt (não há necessidade de cadeias separadas de Runnable)
 messages = [
     ("system", "You are an expert product reviewer."),
     ("human", "List the main features of the product {product_name}."),
@@ -18,8 +18,7 @@ messages = [
 
 prompt_template = ChatPromptTemplate.from_messages(messages)
 
-
-# Define pros analysis step
+# Definir etapa de análise dos prós
 def analyze_pros(features):
     messages = [
         ("system", "You are an expert product reviewer."),
@@ -28,8 +27,7 @@ def analyze_pros(features):
     pros_template = ChatPromptTemplate.from_messages(messages)
     return pros_template.format_prompt(features=features)
 
-
-# Define cons analysis step
+# Definir etapa de análise dos contras
 def analyze_cons(features):
     messages = [
         ("system", "You are an expert product reviewer."),
@@ -38,14 +36,11 @@ def analyze_cons(features):
     cons_template = ChatPromptTemplate.from_messages(messages)
     return cons_template.format_prompt(features=features)
 
-
-# Combine pros and cons into a final review
+# Combinar prós e contras em uma revisão final
 def combine_pros_cons(pros, cons):
     return f"Pros:\n{pros}\n\nCons:\n{cons}"
 
-
-
-# Simplify branches with LCEL
+# Simplificar ramificações com LCEL
 pros_branch_chain = (
     RunnableLambda(lambda x: analyze_pros(x)) | model | StrOutputParser()
 )
@@ -54,7 +49,7 @@ cons_branch_chain = (
     RunnableLambda(lambda x: analyze_cons(x)) | model | StrOutputParser()
 )
 
-# Create the combined chain using LangChain Expression Language (LCEL)
+# Criar a cadeia combinada usando LangChain Expression Language (LCEL)
 chain = (
     prompt_template
     | model
@@ -63,8 +58,8 @@ chain = (
     | RunnableLambda(lambda x: combine_pros_cons(x["branches"]["pros"], x["branches"]["cons"]))
 )
 
-# Run the chain
+# Executar a cadeia
 result = chain.invoke({"product_name": "MacBook Pro"})
 
-# Output
+# Saída
 print(result)

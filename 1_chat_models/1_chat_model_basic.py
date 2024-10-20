@@ -4,24 +4,24 @@
 from dotenv import load_dotenv
 from langchain_ollama import ChatOllama
 
-# Load environment variables from .env
+# Carregar variáveis de ambiente do arquivo .env
 load_dotenv()
 
 
-# Execute before: ollama pull llama3
-# Create a ChatOllama model
+# Execute antes: ollama pull llama3
+# Criar um modelo ChatOllama
 model = ChatOllama(
     model = "llama3",
     temperature = 0.8,
     num_predict = 256,
-    # other params ...
+    # outros parâmetros ...
 )
 
 
 result = model.invoke("what is 81 divided by 9?")
 
-print("Full result:")
+print("Resultado completo:")
 print(result)
 print()
-print("Content only:")
+print("Somente o conteúdo:")
 print(result.content)

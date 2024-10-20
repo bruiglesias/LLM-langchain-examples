@@ -5,29 +5,29 @@ from langchain_community.document_loaders import TextLoader
 from langchain_community.vectorstores import Chroma
 from langchain_ollama import OllamaEmbeddings
 
-# Define the directory containing the text file and the persistent directory
+# Define o diretório que contém o arquivo de texto e o diretório persistente
 current_dir = os.path.dirname(os.path.abspath(__file__))
 file_path = os.path.join(current_dir, "books", "odyssey.txt")
 db_dir = os.path.join(current_dir, "db")
 
-# Check if the text file exists
+# Verifica se o arquivo de texto existe
 if not os.path.exists(file_path):
     raise FileNotFoundError(f"The file {file_path} does not exist. Please check the path.")
 
-# Read the text content from the file
+# Lê o conteúdo do texto a partir do arquivo
 loader = TextLoader(file_path)
 documents = loader.load()
 
-# Split the document into chunks
+# Divide o documento em pedaços
 text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
 docs = text_splitter.split_documents(documents)
 
-# Display information about the split documents
+# Exibe informações sobre os pedaços do documento
 print("\n--- Document Chunks Information ---")
 print(f"Number of document chunks: {len(docs)}")
 print(f"Sample chunk:\n{docs[0].page_content}\n")
 
-# Function to create and persist vector store
+# Função para criar e persistir o vetor de armazenamento
 def create_vector_store(docs, embeddings, store_name):
     persistent_directory = os.path.join(db_dir, store_name)
     if not os.path.exists(persistent_directory):
@@ -40,10 +40,10 @@ def create_vector_store(docs, embeddings, store_name):
 
 
 # 1. OpenAI Embeddings
-# Uses OpenAI's embedding models.
-# Useful for general-purpose embeddings with high accuracy.
-# Note: The cost of using OpenAI embeddings will depend on your OpenAI API usage and pricing plan.
-# Pricing: https://openai.com/api/pricing/
+# Usa os modelos de embedding da OpenAI.
+# Útil para embeddings de propósito geral com alta precisão.
+# Nota: O custo de usar embeddings da OpenAI dependerá do uso da API da OpenAI e do seu plano de preços.
+# Preços: https://openai.com/api/pricing/
 
 #print("\n--- Using OpenAI Embeddings ---")
 #openai_embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
@@ -51,17 +51,17 @@ def create_vector_store(docs, embeddings, store_name):
 
 
 # 2. Hugging Face Transformers
-# Uses models from the Hugging Face library.
-# Ideal for leveraging a wide variety of models for different tasks.
-# Note: Running Hugging Face models locally on your machine incurs no direct cost other than using your computational resources.
-# Note: Find other models at https://huggingface.co/models?other=embeddings
+# Usa modelos da biblioteca Hugging Face.
+# Ideal para aproveitar uma ampla variedade de modelos para diferentes tarefas.
+# Nota: Executar modelos da Hugging Face localmente na sua máquina não gera custos diretos, exceto pelo uso dos seus recursos computacionais.
+# Nota: Encontre outros modelos em https://huggingface.co/models?other=embeddings
 print("\n--- Using Hugging Face Transformers ---")
 huggingface_embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
 create_vector_store(docs, huggingface_embeddings, "chroma_db_huggingface")
 print("Embedding demonstrations for OpenAI and Hugging Face completed.")
 
 
-# Function to query a vector store
+# Função para consultar um vetor de armazenamento
 def query_vector_store(store_name, query, embedding_function):
     persistent_directory = os.path.join(db_dir, store_name)
     if os.path.exists(persistent_directory):
@@ -76,7 +76,7 @@ def query_vector_store(store_name, query, embedding_function):
         )
         relavant_docs = retriever.invoke(query)
 
-        # Display the relevant results with metadata
+        # Exibe os resultados relevantes com metadados
         print(f"\n--- Relevant Documents for {store_name} ---")
         for i, doc in enumerate(relavant_docs, 1):
             print(f"Document {i}:\n{doc.page_content}\n")
@@ -86,10 +86,10 @@ def query_vector_store(store_name, query, embedding_function):
     else:
         print(f"Vector store {store_name} does not exist.")
 
-# Define the user's question
+# Define a pergunta do usuário
 query = "Who is Odysseus' wife?"
 
-# Query each vector store
+# Consulta cada vetor de armazenamento
 #query_vector_store("chroma_db_openai", query, openai_embeddings)
 query_vector_store("chroma_db_huggingface", query, huggingface_embeddings)
 

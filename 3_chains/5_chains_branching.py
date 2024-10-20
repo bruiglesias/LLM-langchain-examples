@@ -4,15 +4,13 @@ from langchain.schema.output_parser import StrOutputParser
 from langchain.schema.runnable import RunnableBranch
 from langchain_ollama import ChatOllama
 
-
-# Load environment variables from .env
+# Carregar variáveis de ambiente do arquivo .env
 load_dotenv()
 
-
-# Create a ChatOllama model
+# Criar um modelo ChatOllama
 model = ChatOllama(model = "llama3")
 
-# Define prompt templates for different feedback types
+# Definir templates de prompt para diferentes tipos de feedback
 positive_feedback_template = ChatPromptTemplate.from_messages(
     [
         ("system", "You are a helpful assistant."),
@@ -44,7 +42,7 @@ escalate_feedback_template = ChatPromptTemplate.from_messages(
     ]
 )
 
-# Define the feedback classification template
+# Definir o template de classificação de feedback
 classification_template = ChatPromptTemplate.from_messages(
     [
         ("system", "You are a helpful assistant."),
@@ -53,37 +51,37 @@ classification_template = ChatPromptTemplate.from_messages(
     ]
 )
 
-# Define the runnable branches for handling feedback
+# Definir as ramificações executáveis para lidar com feedback
 branches = RunnableBranch(
     (
         lambda x: "positive" in x,
-        positive_feedback_template | model | StrOutputParser() # Positive feedback chain
+        positive_feedback_template | model | StrOutputParser()  # Cadeia de feedback positivo
     ),
     (
         lambda x: "negative" in x,
-        negative_feedback_template | model | StrOutputParser()  # Negative feedback chain
+        negative_feedback_template | model | StrOutputParser()  # Cadeia de feedback negativo
     ),
     (
         lambda x: "neutral" in x,
-        neutral_feedback_template | model | StrOutputParser()  # Neutral feedback chain
+        neutral_feedback_template | model | StrOutputParser()  # Cadeia de feedback neutro
     ),
-    escalate_feedback_template | model | StrOutputParser()
+    escalate_feedback_template | model | StrOutputParser()  # Cadeia para escalar feedback
 )
 
-# Create the classification chain
+# Criar a cadeia de classificação
 classification_chain = classification_template | model | StrOutputParser()
 
-# Combine classification and response generation into one chain
+# Combinar classificação e geração de resposta em uma única cadeia
 chain = classification_chain | branches
 
-# Run the chain with an example review
-# Good review - "The product is excellent. I really enjoyed using it and found it very helpful."
-# Bad review - "The product is terrible. It broke after just one use and the quality is very poor."
-# Neutral review - "The product is okay. It works as expected but nothing exceptional."
-# Default - "I'm not sure about the product yet. Can you tell me more about its features and benefits?"
+# Executar a cadeia com um exemplo de revisão
+# Bom review - "The product is excellent. I really enjoyed using it and found it very helpful."
+# review ruim - "The product is terrible. It broke after just one use and the quality is very poor."
+# review neutro - "The product is okay. It works as expected but nothing exceptional."
+# Padrão - "I'm not sure about the product yet. Can you tell me more about its features and benefits?"
 
 review = "The product is terrible. It broke after just one use and the quality is very poor."
 result = chain.invoke({"feedback": review})
 
-# Output the result
+# Saída do resultado
 print(result)

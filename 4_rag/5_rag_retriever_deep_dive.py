@@ -5,27 +5,27 @@ from langchain_ollama import OllamaEmbeddings
 
 load_dotenv()
 
-# Define the persistent directory
+# Define o diretório persistente
 current_dir = os.path.dirname(os.path.abspath(__file__))
 db_dir = os.path.join(current_dir, 'db')
 persistent_directory = os.path.join(db_dir, "chroma_db_with_metadata")
 
 
-# Define the embbeding model
+# Define o modelo de embedding
 embeddings = OllamaEmbeddings(model="llama3")
 
 
-# Load the existing vector store with the different search types and 
-# parameters
-def query_vector_store(store_name, query, embbeding_function, search_type, search_kwargs):
+# Carrega o vetor de armazenamento existente com os diferentes tipos de busca e 
+# parâmetros
+def query_vector_store(store_name, query, embedding_function, search_type, search_kwargs):
     
     if os.path.exists(persistent_directory):
         
-        print(f"\n--- Queryng the vector store {store_name} ---")
+        print(f"\n--- Querying the vector store {store_name} ---")
         
         db = Chroma(
             persist_directory=persistent_directory,
-            embedding_function=embbeding_function
+            embedding_function=embedding_function
         )
         
         retriever = db.as_retriever(
@@ -35,7 +35,7 @@ def query_vector_store(store_name, query, embbeding_function, search_type, searc
 
         relevant_docs = retriever.invoke(query)
 
-        # Display the relevant results with metadata
+        # Exibe os resultados relevantes com metadados
         print(f"\n--- Relevant Documents for {store_name} ---")
 
         for i, doc in enumerate(relevant_docs, 1):
@@ -46,36 +46,36 @@ def query_vector_store(store_name, query, embbeding_function, search_type, searc
         print(f"Vector store {store_name} does not exist.")
     
 
-# Define the user's question
+# Define a pergunta do usuário
 query = "How did Juliet die?"
 
 
 # 1. Similarity Search
-# This method retrieves documents based on vector similarity.
-# It finds the most similar documents to the query vector based on cosine similarity.
-# Use this when you want to retrieve the top k most similar documents.
+# Este método recupera documentos com base em vetor de similaridade.
+# Ele encontra os documentos mais semelhantes ao vetor da consulta com base na similaridade cosseno.
+# Use isso quando você quiser recuperar os k documentos mais semelhantes.
 print("\n--- Using Similarity Search ---")
 query_vector_store("chroma_db_with_metadata", query, embeddings,
                    "similarity", {"k": 3})
 
 
 # 2. Max Marginal Relevance (MMR)
-# This method balances between selecting documents that are relevant to the query and diverse among themselves.
-# 'fetch_k' specifies the number of documents to initially fetch based on similarity.
-# 'lambda_mult' controls the diversity of the results: 1 for minimum diversity, 0 for maximum.
-# Use this when you want to avoid redundancy and retrieve diverse yet relevant documents.
-# Note: Relevance measures how closely documents match the query.
-# Note: Diversity ensures that the retrieved documents are not too similar to each other,
-#       providing a broader range of information.
+# Este método equilibra a seleção de documentos que são relevantes para a consulta e diversos entre si.
+# 'fetch_k' especifica o número de documentos a serem inicialmente buscados com base na similaridade.
+# 'lambda_mult' controla a diversidade dos resultados: 1 para diversidade mínima, 0 para diversidade máxima.
+# Use isso quando você quiser evitar redundância e recuperar documentos relevantes, mas variados.
+# Nota: A relevância mede quão bem os documentos correspondem à consulta.
+# Nota: A diversidade garante que os documentos recuperados não sejam muito semelhantes entre si,
+#       proporcionando uma gama mais ampla de informações.
 print("\n--- Using Max Marginal Relevance (MMR) ---")
 query_vector_store("chroma_db_with_metadata", query, embeddings, 
                    "mmr", {"k": 3, "fetch_k": 20, "lambda_mult": 0.5})
 
 
 # 3. Similarity Score Threshold
-# This method retrieves documents that exceed a certain similarity score threshold.
-# 'score_threshold' sets the minimum similarity score a document must have to be considered relevant.
-# Use this when you want to ensure that only highly relevant documents are retrieved, filtering out less relevant ones.
+# Este método recupera documentos que superam um determinado limite de pontuação de similaridade.
+# 'score_threshold' define a pontuação mínima de similaridade que um documento deve ter para ser considerado relevante.
+# Use isso quando você quiser garantir que apenas documentos altamente relevantes sejam recuperados, filtrando os menos relevantes.
 print("\n--- Using Similarity Score Threshold ---")
 query_vector_store("chroma_db_with_metadata", query, embeddings, 
                    "mmr", {"k": 3, "fetch_k": 20, "lambda_mult": 0.5})
