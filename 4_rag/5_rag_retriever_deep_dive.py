@@ -77,8 +77,8 @@ query_vector_store("chroma_db_with_metadata", query, embeddings,
 # 'score_threshold' define a pontuação mínima de similaridade que um documento deve ter para ser considerado relevante.
 # Use isso quando você quiser garantir que apenas documentos altamente relevantes sejam recuperados, filtrando os menos relevantes.
 print("\n--- Using Similarity Score Threshold ---")
-query_vector_store("chroma_db_with_metadata", query, embeddings, 
-                   "mmr", {"k": 3, "fetch_k": 20, "lambda_mult": 0.5})
+query_vector_store("chroma_db_with_metadata", query, embeddings, "similarity_score_threshold", 
+                   {"k": 3, "score_threshold": 0.1},)
 
 
 print("Querying demonstrations with different search types completed.")
